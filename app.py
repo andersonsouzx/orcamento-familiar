@@ -199,6 +199,17 @@ def excluir(id):
     return redirect(url_for("index"))
 
 
+@app.route("/resetar", methods=["GET", "POST"])
+def resetar():
+    conn = get_db_connection()
+    conn.execute("DROP TABLE IF EXISTS lancamentos")
+    conn.execute("DROP TABLE IF EXISTS categorias")
+    conn.execute("DROP TABLE IF EXISTS configuracoes")
+    conn.commit()
+    conn.close()
+    init_db()
+    return redirect(url_for("index"))
+
 init_db()
 
 if __name__ == "__main__":

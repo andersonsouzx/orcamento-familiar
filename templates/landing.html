@@ -275,6 +275,92 @@
                 line-height: 1.6;
             }
         }
+
+        /* --- TELA DE TRANSIÇÃO FINLAR --- */
+        #transition-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: #06090f;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+
+        #transition-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loader-logo {
+            animation: pulseHouse 1.3s ease-in-out infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes pulseHouse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.35));
+            }
+
+            50% {
+                transform: scale(1.08);
+                filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.6));
+            }
+        }
+
+        .loader-bar-track {
+            width: 190px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 1.1rem;
+        }
+
+        .loader-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #38bdf8);
+            border-radius: 99px;
+        }
+
+        #transition-overlay.active .loader-bar-fill {
+            animation: fillProgress 1.85s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+        }
+
+        @keyframes fillProgress {
+            0% {
+                width: 0%;
+            }
+
+            35% {
+                width: 38%;
+            }
+
+            70% {
+                width: 76%;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        .loading-text {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -310,7 +396,7 @@
                 <span class="highlight">em total equilíbrio</span>
             </h1>
             <div class="button-box">
-                <button type="button" class="btn-cta" onclick="window.location.href='/dashboard'">
+                <button type="button" id="btn-enter" class="btn-cta">
                     Acessar Painel
                 </button>
             </div>
@@ -345,6 +431,24 @@
                 PROJETO PRÁTICO DE SISTEMAS APLICADOS A NEGÓCIOS | UNINOVE • 2026
             </div>
         </footer>
+    </div>
+
+    <!-- Overlay de Transição -->
+    <div id="transition-overlay">
+        <div class="loader-logo">
+            <svg width="76" height="76" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="42" height="42" rx="12" fill="#0d1520" stroke="#10b981" stroke-width="2" />
+                <path d="M14 25L24 16L34 25" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                <path d="M18 23V33H30V23" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                <circle cx="24" cy="27" r="2.2" fill="#34d399" />
+            </svg>
+        </div>
+        <div class="loader-bar-track">
+            <div class="loader-bar-fill"></div>
+        </div>
+        <p class="loading-text">Carregando painel financeiro...</p>
     </div>
 
     <script>
@@ -461,6 +565,21 @@
         // Garante que feche também ao tocar fora em telas de celular
         document.addEventListener("click", () => {
             document.querySelectorAll(".pillar-box").forEach((b) => b.classList.remove("active"));
+        });
+
+        const btnEnter = document.getElementById("btn-enter");
+        const transitionOverlay = document.getElementById("transition-overlay");
+
+        btnEnter.addEventListener("click", () => {
+            transitionOverlay.classList.add("active");
+            setTimeout(() => {
+                window.location.href = "/dashboard";
+            }, 2000);
+        });
+
+        // Evita que a tela fique travada no overlay se o usuário clicar em "Voltar" no navegador
+        window.addEventListener("pageshow", () => {
+            transitionOverlay.classList.remove("active");
         });
 
     </script>

@@ -154,25 +154,6 @@
             }
         }
 
-        .pillar-box {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.85rem 1.25rem;
-            cursor: default;
-        }
-
-        .pillar-box::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: -28px;
-        }
-
         .pillar-title {
             font-size: 0.95rem;
             font-weight: 700;
@@ -181,12 +162,6 @@
             text-transform: uppercase;
             margin-bottom: 0;
             transition: transform 0.7s ease, color 0.7s ease, text-shadow 0.7s ease;
-        }
-
-        .pillar-box:hover .pillar-title {
-            transform: translateY(-18px);
-            color: #34d399;
-            text-shadow: 0 0 14px rgba(52, 211, 153, 0.35);
         }
 
         .pillar-desc {
@@ -205,7 +180,37 @@
             transition: opacity 0.7s ease, transform 0.7s ease;
         }
 
-        .pillar-box:hover .pillar-desc {
+        /* Comportamento no PC (mouse) */
+        @media (hover: hover) {
+            .pillar-box::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: -28px;
+            }
+
+            .pillar-box:hover .pillar-title {
+                transform: translateY(-18px);
+                color: #34d399;
+                text-shadow: 0 0 14px rgba(52, 211, 153, 0.35);
+            }
+
+            .pillar-box:hover .pillar-desc {
+                opacity: 1;
+                transform: translateY(-2px);
+            }
+        }
+
+        /* Comportamento no celular (toque) */
+        .pillar-box.active .pillar-title {
+            transform: translateY(-18px);
+            color: #34d399;
+            text-shadow: 0 0 14px rgba(52, 211, 153, 0.35);
+        }
+
+        .pillar-box.active .pillar-desc {
             opacity: 1;
             transform: translateY(-2px);
         }
@@ -215,6 +220,12 @@
                 transition: padding-bottom 0.7s ease;
             }
 
+            .pillar-box.active {
+                padding-bottom: 3.4rem;
+            }
+        }
+
+        @media (max-width: 767px) and (hover: hover) {
             .pillar-box:hover {
                 padding-bottom: 3.4rem;
             }
@@ -368,7 +379,6 @@
     <canvas id="bg-canvas"></canvas>
 
     <div class="page-wrapper">
-        <!-- Cabeçalho -->
         <!-- Cabeçalho -->
         <header class="top-bar">
             <div class="logo-badge">

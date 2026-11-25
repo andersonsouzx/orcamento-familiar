@@ -139,16 +139,38 @@
         }
 
         .pillar-box {
+            position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 0.85rem 1.25rem;
+            cursor: default;
         }
 
         @media (min-width: 768px) {
             .pillar-divider {
                 border-right: 1px solid rgba(52, 211, 153, 0.22);
             }
+        }
+
+        .pillar-box {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.85rem 1.25rem;
+            cursor: default;
+        }
+
+        .pillar-box::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: -28px;
         }
 
         .pillar-title {
@@ -158,6 +180,44 @@
             color: #cbd5e1;
             text-transform: uppercase;
             margin-bottom: 0;
+            transition: transform 0.7s ease, color 0.7s ease, text-shadow 0.7s ease;
+        }
+
+        .pillar-box:hover .pillar-title {
+            transform: translateY(-18px);
+            color: #34d399;
+            text-shadow: 0 0 14px rgba(52, 211, 153, 0.35);
+        }
+
+        .pillar-desc {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            margin: 0;
+            opacity: 0;
+            transform: translateY(6px);
+            pointer-events: none;
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .pillar-box:hover .pillar-desc {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 767px) {
+            .pillar-box {
+                transition: padding-bottom 0.7s ease;
+            }
+
+            .pillar-box:hover {
+                padding-bottom: 3.4rem;
+            }
         }
 
         .footer-credits {
@@ -205,16 +265,6 @@
         .footer-credits {
             opacity: 0;
             animation: fadeUp 0.8s ease-out 0.8s forwards;
-        }
-
-        /* Realce discreto nos pilares ao passar o mouse */
-        .pillar-title {
-            transition: color 0.25s ease, text-shadow 0.25s ease;
-        }
-
-        .pillar-box:hover .pillar-title {
-            color: #34d399;
-            text-shadow: 0 0 14px rgba(52, 211, 153, 0.35);
         }
 
         /* Ajuste dos créditos em telas de celular */
@@ -266,22 +316,33 @@
             </div>
         </main>
 
-        <!-- Pilares e Rodapé -->
         <footer class="pillars-container">
             <div class="row g-3 justify-content-center">
                 <div class="col-md-4 pillar-box pillar-divider">
                     <div class="pillar-title">Planejamento</div>
+                    <p class="pillar-desc">
+                        Limites por categoria<br>
+                        Controle de orçamento
+                    </p>
                 </div>
                 <div class="col-md-4 pillar-box pillar-divider">
                     <div class="pillar-title">Transparência</div>
+                    <p class="pillar-desc">
+                        Cálculo em tempo real<br>
+                        Saldo sempre atualizado
+                    </p>
                 </div>
                 <div class="col-md-4 pillar-box">
                     <div class="pillar-title">Organização</div>
+                    <p class="pillar-desc">
+                        Histórico detalhado<br>
+                        Gestão simples e rápida
+                    </p>
                 </div>
             </div>
 
             <div class="footer-credits">
-                PROJETO PRÁTICO DE SISTEMAS APLICADOS A NEGÓCIOS • 2026 | UNINOVE
+                PROJETO PRÁTICO DE SISTEMAS APLICADOS A NEGÓCIOS | UNINOVE • 2026
             </div>
         </footer>
     </div>
@@ -383,6 +444,25 @@
         window.addEventListener("resize", initCanvas);
         initCanvas();
         animate();
+
+        document.querySelectorAll(".pillar-box").forEach((box) => {
+            box.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const isActive = box.classList.contains("active");
+                document.querySelectorAll(".pillar-box").forEach((b) => b.classList.remove("active"));
+                if (!isActive) box.classList.add("active");
+            });
+
+            box.addEventListener("mouseleave", () => {
+                box.classList.remove("active");
+            });
+        });
+
+        // Garante que feche também ao tocar fora em telas de celular
+        document.addEventListener("click", () => {
+            document.querySelectorAll(".pillar-box").forEach((b) => b.classList.remove("active"));
+        });
+
     </script>
 </body>
 

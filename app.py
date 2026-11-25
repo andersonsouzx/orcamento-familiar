@@ -9,7 +9,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_NAME = os.path.join(BASE_DIR, "orcamento.db")
 
 
-# Filtros personalizados para formatar moeda e data no HTML
 @app.template_filter("moeda")
 def formatar_moeda(valor):
     if valor is None:
@@ -97,7 +96,12 @@ def init_db():
 
 
 @app.route("/")
-def index():
+def landing():
+    return render_template("landing.html")
+
+
+@app.route("/dashboard")
+def dashboard():
     conn = get_db_connection()
 
     config = conn.execute("SELECT renda_mensal FROM configuracoes WHERE id = 1").fetchone()
@@ -114,7 +118,6 @@ def index():
         GROUP BY c.id
     """).fetchall()
 
-    # Calcula percentual e cor da barra de progresso para cada categoria
     categorias = []
     for cat in categorias_db:
         limite = cat["limite_mensal"]
@@ -177,7 +180,7 @@ def adicionar():
     )
     conn.commit()
     conn.close()
-    return redirect(url_for("index"))
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/atualizar-renda", methods=["POST"])
@@ -187,7 +190,7 @@ def atualizar_renda():
     conn.execute("UPDATE configuracoes SET renda_mensal = ? WHERE id = 1", (nova_renda,))
     conn.commit()
     conn.close()
-    return redirect(url_for("index"))
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/excluir/<int:id>", methods=["POST"])
@@ -196,7 +199,7 @@ def excluir(id):
     conn.execute("DELETE FROM lancamentos WHERE id = ?", (id,))
     conn.commit()
     conn.close()
-    return redirect(url_for("index"))
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/resetar", methods=["GET", "POST"])
@@ -208,7 +211,8 @@ def resetar():
     conn.commit()
     conn.close()
     init_db()
-    return redirect(url_for("index"))
+    return redirect(url_for("dashboard"))
+
 
 init_db()
 

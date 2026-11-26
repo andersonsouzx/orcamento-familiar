@@ -12,7 +12,8 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        :root, [data-bs-theme="dark"] {
+        :root,
+        [data-bs-theme="dark"] {
             --bs-secondary-color: #94a3b8;
             --bs-secondary-rgb: 148, 163, 184;
         }
@@ -133,7 +134,8 @@
                 title="Voltar à página inicial">
                 <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
                     style="filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.35));">
-                    <rect x="3" y="3" width="42" height="42" rx="12" fill="#0d1520" stroke="#10b981" stroke-width="2.2" />
+                    <rect x="3" y="3" width="42" height="42" rx="12" fill="#0d1520" stroke="#10b981"
+                        stroke-width="2.2" />
                     <path d="M14 25L24 16L34 25" stroke="#34d399" stroke-width="2.6" stroke-linecap="round"
                         stroke-linejoin="round" />
                     <path d="M18 23V33H30V23" stroke="#38bdf8" stroke-width="2.3" stroke-linecap="round"
@@ -143,9 +145,10 @@
                 <span class="brand-logo-text">FINLAR</span>
             </a>
             <div class="d-flex align-items-center gap-2">
-                <a href="/resetar" class="btn btn-sm btn-secondary" title="Voltar aos dados iniciais">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                    data-bs-target="#modalRestaurarDemo" title="Voltar aos dados iniciais">
                     <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurar demo
-                </a>
+                </button>
                 <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
                     data-bs-target="#modalResetarTudo" title="Zerar todos os dados para começar do zero">
                     <i class="bi bi-trash3 me-1"></i> Limpar tudo
@@ -507,6 +510,39 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-danger fw-semibold">
                             <i class="bi bi-trash3 me-1"></i> Excluir
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação para Restaurar Demo -->
+    <div class="modal fade" id="modalRestaurarDemo" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form action="/resetar" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-warning d-flex align-items-center gap-2">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                            Restaurar dados de demonstração
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-white fw-medium mb-2">
+                            Deseja voltar o painel para os dados iniciais de exemplo?
+                        </p>
+                        <p class="small mb-0" style="color: #cbd5e1; line-height: 1.5;">
+                            Essa ação vai <strong class="text-white">substituir a renda, os limites e todas as despesas
+                                atuais</strong> pelos valores padrão de demonstração (<strong class="text-white">R$
+                                4.500,00</strong> de renda e lançamentos de exemplo).
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning text-dark fw-semibold">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Sim, restaurar demo
                         </button>
                     </div>
                 </form>

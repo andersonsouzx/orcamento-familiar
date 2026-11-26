@@ -8,6 +8,14 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_NAME = os.path.join(BASE_DIR, "orcamento.db")
 
+PERCENTUAIS_CATEGORIAS = {
+    "Moradia": 0.35,
+    "Alimentação": 0.22,
+    "Contas Fixas": 0.13,
+    "Transporte": 0.10,
+    "Lazer": 0.10,
+}
+
 
 @app.template_filter("moeda")
 def formatar_moeda(valor):
@@ -28,6 +36,17 @@ def get_db_connection():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def aplicar_limites_automaticos(conn, renda):
+    categorias = conn.execute("SELECT id, nome FROM categorias").fetchall()
+    for cat in categorias:
+        percentual = PERCENTUAIS_CATEGORIAS.get(cat["nome"], 0.10)
+        novo_limite = round(renda * percentual, 2)
+        conn.execute(
+            "UPDATE categorias SET limite_mensal = ? WHERE id = ?",
+            (novo_limite, cat["id"]),
+        )
 
 
 def init_db():
@@ -122,8 +141,15 @@ def dashboard():
     for cat in categorias_db:
         limite = cat["limite_mensal"]
         gasto = cat["total_gasto"]
-        percentual = (gasto / limite * 100) if limite > 0 else 0
-        if percentual >= 100:
+
+        if limite > 0:
+            percentual = gasto / limite * 100
+        elif gasto > 0:
+            percentual = 100.0
+        else:
+            percentual = 0.0
+
+        if percentual >= 100 or (limite == 0 and gasto > 0):
             cor_barra = "bg-danger"
         elif percentual >= 80:
             cor_barra = "bg-warning"
@@ -162,6 +188,7 @@ def dashboard():
         percentual_renda=round(percentual_renda, 1),
         categorias=categorias,
         lancamentos=lancamentos,
+        percentuais_categorias=PERCENTUAIS_CATEGORIAS,
         hoje=date.today().isoformat(),
     )
 
@@ -185,9 +212,30 @@ def adicionar():
 
 @app.route("/atualizar-renda", methods=["POST"])
 def atualizar_renda():
-    nova_renda = float(request.form.get("renda_mensal"))
+    nova_renda = max(0.0, float(request.form.get("renda_mensal", 0)))
+    recalcular = request.form.get("recalcular_limites") == "on"
+
     conn = get_db_connection()
     conn.execute("UPDATE configuracoes SET renda_mensal = ? WHERE id = 1", (nova_renda,))
+    if recalcular:
+        aplicar_limites_automaticos(conn, nova_renda)
+    conn.commit()
+    conn.close()
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/atualizar-limites", methods=["POST"])
+def atualizar_limites():
+    conn = get_db_connection()
+    categorias = conn.execute("SELECT id FROM categorias").fetchall()
+    for cat in categorias:
+        campo = request.form.get(f"limite_{cat['id']}")
+        if campo is not None and campo.strip() != "":
+            novo_limite = max(0.0, float(campo))
+            conn.execute(
+                "UPDATE categorias SET limite_mensal = ? WHERE id = ?",
+                (novo_limite, cat["id"]),
+            )
     conn.commit()
     conn.close()
     return redirect(url_for("dashboard"))

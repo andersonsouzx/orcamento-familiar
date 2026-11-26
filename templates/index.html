@@ -163,9 +163,14 @@
             <!-- Coluna Esquerda: Orçamento por Categoria -->
             <div class="col-lg-5">
                 <div class="card shadow-sm h-100">
-                    <div class="card-header bg-transparent border-secondary-subtle py-3">
+                    <div
+                        class="card-header bg-transparent border-secondary-subtle py-3 d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 fw-semibold"><i class="bi bi-pie-chart text-info me-2"></i>Limites por Categoria
                         </h5>
+                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                            data-bs-target="#modalLimites" title="Editar Limites por Categoria">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </button>
                     </div>
                     <div class="card-body d-flex flex-column gap-3">
                         {% for cat in categorias %}
@@ -270,10 +275,78 @@
                         <label class="form-label text-secondary">Novo valor da renda mensal (R$)</label>
                         <input type="number" step="0.01" min="0" name="renda_mensal"
                             class="form-control form-control-lg" value="{{ renda_mensal }}" required>
+
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" name="recalcular_limites"
+                                id="checkRecalcular" checked>
+                            <label class="form-check-label text-light small" for="checkRecalcular">
+                                Dividir limites por categoria automaticamente
+                            </label>
+                            <div class="form-text text-secondary" style="font-size: 0.78rem;">
+                                Distribui 90% da nova renda entre as categorias (Moradia 35%, Alimentação 22%, Contas
+                                Fixas 13%, Transporte 10% e Lazer 10%) e reserva 10% livres.
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer border-secondary">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-info fw-semibold">Salvar Alteração</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Limites por Categoria -->
+    <div class="modal fade" id="modalLimites" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark border-secondary">
+                <form action="/atualizar-limites" method="POST">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">Limites Mensais por Categoria</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% for cat in categorias %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="limite_{{ cat.id }}" class="form-label text-light fw-medium mb-0">{{
+                                    cat.nome }}</label>
+                                <small class="text-secondary">Sugestão: {{ (percentuais_categorias.get(cat.nome, 0.10) *
+                                    100) | int }}%</small>
+                            </div>
+                            <div class="input-group">
+                                <span
+                                    class="input-group-text bg-secondary-subtle border-secondary text-secondary">R$</span>
+                                <input type="number" step="0.01" min="0" name="limite_{{ cat.id }}"
+                                    id="limite_{{ cat.id }}" class="form-control input-limite"
+                                    data-percentual="{{ percentuais_categorias.get(cat.nome, 0.10) }}"
+                                    value="{{ '%.2f'|format(cat.limite_mensal) }}" required>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="p-3 rounded-3 border border-secondary bg-black bg-opacity-25 mt-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-secondary">Total dos limites definidos:</span>
+                                <strong id="somaLimitesTexto" class="text-light">R$ 0,00</strong>
+                            </div>
+                            <div class="d-flex justify-content-between small">
+                                <span class="text-secondary">Renda familiar mensal:</span>
+                                <span class="text-info fw-semibold">{{ renda_mensal | moeda }}</span>
+                            </div>
+                            <div id="statusLimitesTexto" class="small mt-2"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary justify-content-between">
+                        <button type="button" id="btnSugerirLimites" class="btn btn-sm btn-outline-secondary"
+                            title="Preencher automaticamente conforme a renda atual">
+                            <i class="bi bi-magic me-1"></i> Sugerir pela Renda
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-info fw-semibold">Salvar Limites</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -287,6 +360,54 @@
         if (navEntries.length > 0 && navEntries[0].type === "reload") {
             window.location.replace("/resetar");
         }
+
+        const rendaAtual = {{ renda_mensal }};
+        const inputsLimites = document.querySelectorAll(".input-limite");
+        const somaLimitesTexto = document.getElementById("somaLimitesTexto");
+        const statusLimitesTexto = document.getElementById("statusLimitesTexto");
+        const btnSugerirLimites = document.getElementById("btnSugerirLimites");
+
+        const formatadorBRL = new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+        });
+
+        function atualizarResumoLimites() {
+            let soma = 0;
+            inputsLimites.forEach((input) => {
+                const val = parseFloat(input.value);
+                if (!isNaN(val) && val > 0) {
+                    soma += val;
+                }
+            });
+
+            somaLimitesTexto.textContent = formatadorBRL.format(soma);
+            const diferenca = rendaAtual - soma;
+
+            if (diferenca < 0) {
+                somaLimitesTexto.className = "text-warning fw-bold";
+                statusLimitesTexto.className = "small mt-2 text-warning";
+                statusLimitesTexto.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i>A soma dos limites ultrapassa a renda em <strong>${formatadorBRL.format(Math.abs(diferenca))}</strong>.`;
+            } else {
+                somaLimitesTexto.className = "text-success fw-bold";
+                statusLimitesTexto.className = "small mt-2 text-secondary";
+                statusLimitesTexto.innerHTML = `Margem livre não alocada: <strong class="text-light">${formatadorBRL.format(diferenca)}</strong>`;
+            }
+        }
+
+        inputsLimites.forEach((input) => {
+            input.addEventListener("input", atualizarResumoLimites);
+        });
+
+        btnSugerirLimites.addEventListener("click", () => {
+            inputsLimites.forEach((input) => {
+                const perc = parseFloat(input.dataset.percentual) || 0.10;
+                input.value = (rendaAtual * perc).toFixed(2);
+            });
+            atualizarResumoLimites();
+        });
+
+        atualizarResumoLimites();
     </script>
 </body>
 

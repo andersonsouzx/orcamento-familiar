@@ -97,13 +97,13 @@ def init_db():
 
         hoje = date.today().isoformat()
         lancamentos_iniciais = [
-            ("Aluguel Apartamento", 1350.00, hoje, 1),
-            ("Compra do Mês (Mercado)", 620.50, hoje, 2),
-            ("Feira e Açougue", 185.00, hoje, 2),
-            ("Conta de Luz (Enel)", 145.80, hoje, 3),
-            ("Internet Fibra", 119.90, hoje, 3),
-            ("Recarga Bilhete Único", 220.00, hoje, 4),
-            ("Cinema e Lanche", 130.00, hoje, 5),
+            ("Aluguel apartamento", 1350.00, hoje, 1),
+            ("Compra do mês (mercado)", 620.50, hoje, 2),
+            ("Feira e açougue", 185.00, hoje, 2),
+            ("Conta de luz (Enel)", 145.80, hoje, 3),
+            ("Internet fibra", 119.90, hoje, 3),
+            ("Recarga bilhete único", 220.00, hoje, 4),
+            ("Cinema e lanche", 130.00, hoje, 5),
         ]
         cursor.executemany(
             "INSERT INTO lancamentos (descricao, valor, data, categoria_id) VALUES (?, ?, ?, ?)",

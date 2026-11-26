@@ -12,8 +12,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        :root,
-        [data-bs-theme="dark"] {
+        :root, [data-bs-theme="dark"] {
             --bs-secondary-color: #94a3b8;
             --bs-secondary-rgb: 148, 163, 184;
         }
@@ -109,7 +108,7 @@
 
         .modal-content {
             background-color: #0d1520;
-            border: 1px solid #1e293b;
+            border: 1px solid #26354d;
             border-radius: 14px;
         }
 
@@ -121,16 +120,6 @@
         .resumo-limites-box {
             background-color: #070b14;
             border: 1px solid #1e293b;
-        }
-
-        .dashboard-footer {
-            margin-top: auto;
-            padding: 1.5rem 0 1.75rem;
-            text-align: center;
-            font-size: 0.72rem;
-            letter-spacing: 2.5px;
-            color: #475569;
-            text-transform: uppercase;
         }
     </style>
 </head>
@@ -144,8 +133,7 @@
                 title="Voltar à página inicial">
                 <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
                     style="filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.35));">
-                    <rect x="3" y="3" width="42" height="42" rx="12" fill="#0d1520" stroke="#10b981"
-                        stroke-width="2.2" />
+                    <rect x="3" y="3" width="42" height="42" rx="12" fill="#0d1520" stroke="#10b981" stroke-width="2.2" />
                     <path d="M14 25L24 16L34 25" stroke="#34d399" stroke-width="2.6" stroke-linecap="round"
                         stroke-linejoin="round" />
                     <path d="M18 23V33H30V23" stroke="#38bdf8" stroke-width="2.3" stroke-linecap="round"
@@ -346,13 +334,12 @@
                                         </td>
                                         <td class="text-end fw-semibold text-warning">{{ item.valor | moeda }}</td>
                                         <td class="text-center pe-3">
-                                            <form action="/excluir/{{ item.id }}" method="POST" class="d-inline"
-                                                onsubmit="return confirm('Deseja excluir esta despesa?');">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger border-0"
-                                                    title="Excluir">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-sm btn-outline-danger border-0"
+                                                data-bs-toggle="modal" data-bs-target="#modalExcluirDespesa"
+                                                data-id="{{ item.id }}" data-descricao="{{ item.descricao }}"
+                                                data-valor="{{ item.valor | moeda }}" title="Excluir">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                     {% else %}
@@ -495,14 +482,41 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmação para Excluir Despesa Individual -->
+    <div class="modal fade" id="modalExcluirDespesa" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="formExcluirDespesa" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-danger d-flex align-items-center gap-2">
+                            <i class="bi bi-trash3-fill"></i>
+                            Excluir despesa
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-white fw-medium mb-2">
+                            Deseja realmente excluir este lançamento?
+                        </p>
+                        <div class="p-3 rounded-3 resumo-limites-box d-flex justify-content-between align-items-center">
+                            <span id="descExcluirDespesa" class="text-light fw-medium"></span>
+                            <span id="valorExcluirDespesa" class="text-warning fw-semibold"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger fw-semibold">
+                            <i class="bi bi-trash3 me-1"></i> Excluir
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const navEntries = performance.getEntriesByType("navigation");
-        if (navEntries.length > 0 && navEntries[0].type === "reload") {
-            window.location.replace("/resetar");
-        }
-
         const rendaAtual = {{ renda_mensal }};
         const inputsLimites = document.querySelectorAll(".input-limite");
         const somaLimitesTexto = document.getElementById("somaLimitesTexto");
@@ -550,6 +564,18 @@
         });
 
         atualizarResumoLimites();
+
+        const modalExcluirDespesa = document.getElementById("modalExcluirDespesa");
+        const formExcluirDespesa = document.getElementById("formExcluirDespesa");
+        const descExcluirDespesa = document.getElementById("descExcluirDespesa");
+        const valorExcluirDespesa = document.getElementById("valorExcluirDespesa");
+
+        modalExcluirDespesa.addEventListener("show.bs.modal", (event) => {
+            const botao = event.relatedTarget;
+            formExcluirDespesa.action = `/excluir/${botao.dataset.id}`;
+            descExcluirDespesa.textContent = botao.dataset.descricao;
+            valorExcluirDespesa.textContent = botao.dataset.valor;
+        });
     </script>
 </body>
 

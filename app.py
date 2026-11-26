@@ -195,15 +195,22 @@ def dashboard():
 
 @app.route("/adicionar", methods=["POST"])
 def adicionar():
-    descricao = request.form.get("descricao")
-    valor = float(request.form.get("valor"))
-    data_lancamento = request.form.get("data")
-    categoria_id = int(request.form.get("categoria_id"))
+    descricao = (request.form.get("descricao") or "").strip()
+    data_lancamento = request.form.get("data") or date.today().isoformat()
+
+    try:
+        valor = float(request.form.get("valor", 0))
+        categoria_id = int(request.form.get("categoria_id", 0))
+    except (ValueError, TypeError):
+        return redirect(url_for("dashboard"))
+
+    if not descricao or valor <= 0 or categoria_id <= 0:
+        return redirect(url_for("dashboard"))
 
     conn = get_db_connection()
     conn.execute(
         "INSERT INTO lancamentos (descricao, valor, data, categoria_id) VALUES (?, ?, ?, ?)",
-        (descricao, valor, data_lancamento, categoria_id),
+        (descricao, round(valor, 2), data_lancamento, categoria_id),
     )
     conn.commit()
     conn.close()
@@ -212,11 +219,15 @@ def adicionar():
 
 @app.route("/atualizar-renda", methods=["POST"])
 def atualizar_renda():
-    nova_renda = max(0.0, float(request.form.get("renda_mensal", 0)))
+    try:
+        nova_renda = max(0.0, float(request.form.get("renda_mensal", 0)))
+    except (ValueError, TypeError):
+        return redirect(url_for("dashboard"))
+
     recalcular = request.form.get("recalcular_limites") == "on"
 
     conn = get_db_connection()
-    conn.execute("UPDATE configuracoes SET renda_mensal = ? WHERE id = 1", (nova_renda,))
+    conn.execute("UPDATE configuracoes SET renda_mensal = ? WHERE id = 1", (round(nova_renda, 2),))
     if recalcular:
         aplicar_limites_automaticos(conn, nova_renda)
     conn.commit()
@@ -231,11 +242,14 @@ def atualizar_limites():
     for cat in categorias:
         campo = request.form.get(f"limite_{cat['id']}")
         if campo is not None and campo.strip() != "":
-            novo_limite = max(0.0, float(campo))
-            conn.execute(
-                "UPDATE categorias SET limite_mensal = ? WHERE id = ?",
-                (novo_limite, cat["id"]),
-            )
+            try:
+                novo_limite = max(0.0, float(campo))
+                conn.execute(
+                    "UPDATE categorias SET limite_mensal = ? WHERE id = ?",
+                    (round(novo_limite, 2), cat["id"]),
+                )
+            except (ValueError, TypeError):
+                continue
     conn.commit()
     conn.close()
     return redirect(url_for("dashboard"))
@@ -260,6 +274,7 @@ def resetar():
     conn.close()
     init_db()
     return redirect(url_for("dashboard"))
+
 
 @app.route("/resetar-tudo", methods=["POST"])
 def resetar_tudo():

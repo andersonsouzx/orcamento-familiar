@@ -261,6 +261,16 @@ def resetar():
     init_db()
     return redirect(url_for("dashboard"))
 
+@app.route("/resetar-tudo", methods=["POST"])
+def resetar_tudo():
+    conn = get_db_connection()
+    conn.execute("DELETE FROM lancamentos")
+    conn.execute("UPDATE configuracoes SET renda_mensal = 0.0 WHERE id = 1")
+    conn.execute("UPDATE categorias SET limite_mensal = 0.0")
+    conn.commit()
+    conn.close()
+    return redirect(url_for("dashboard"))
+
 
 init_db()
 

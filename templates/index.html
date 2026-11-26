@@ -43,12 +43,20 @@
                 <span>Finlar</span>
             </a>
             <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">
+                <span
+                    class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle d-none d-sm-inline-block">
                     Controle Mensal
                 </span>
                 <a href="/resetar" class="btn btn-sm btn-outline-secondary" title="Voltar aos dados iniciais">
                     <i class="bi bi-arrow-counterclockwise me-1"></i> Resetar Demo
                 </a>
+                <form action="/resetar-tudo" method="POST" class="d-inline"
+                    onsubmit="return confirm('Isso vai zerar a renda, os limites e apagar todas as despesas. Deseja continuar?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                        title="Zerar todos os dados para começar do zero">
+                        <i class="bi bi-trash3 me-1"></i> Resetar Tudo
+                    </button>
+                </form>
             </div>
         </div>
     </nav>

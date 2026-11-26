@@ -30,6 +30,24 @@
         .table> :not(caption)>*>* {
             background-color: transparent;
         }
+
+        .brand-logo-text {
+            font-size: 1.45rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #34d399;
+            text-shadow: 0 0 18px rgba(16, 185, 129, 0.45);
+            line-height: 1;
+        }
+
+        .brand-logo-sub {
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 1.8px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
     </style>
 </head>
 
@@ -38,9 +56,21 @@
     <!-- Barra Superior -->
     <nav class="navbar navbar-expand-lg mb-4 py-3">
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="/">
-                <i class="bi bi-wallet2 text-success fs-4"></i>
-                <span>Finlar</span>
+            <a class="navbar-brand d-flex align-items-center gap-3 text-decoration-none" href="/"
+                title="Voltar à página inicial">
+                <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    style="filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.35));">
+                    <rect x="3" y="3" width="42" height="42" rx="12" fill="#0d1520" stroke="#10b981"
+                        stroke-width="2.2" />
+                    <path d="M14 25L24 16L34 25" stroke="#34d399" stroke-width="2.6" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M18 23V33H30V23" stroke="#38bdf8" stroke-width="2.3" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <circle cx="24" cy="27" r="2.2" fill="#34d399" />
+                </svg>
+                <div class="d-flex flex-column">
+                    <span class="brand-logo-text">FINLAR</span>
+                </div>
             </a>
             <div class="d-flex align-items-center gap-2">
                 <a href="/resetar" class="btn btn-sm btn-secondary" title="Voltar aos dados iniciais">

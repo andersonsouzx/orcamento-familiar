@@ -161,6 +161,10 @@
                 <span class="brand-logo-text">FINLAR</span>
             </a>
             <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal"
+                    data-bs-target="#modalBoasVindas" title="Sobre o Finlar e como usar">
+                    <i class="bi bi-info-circle"></i>
+                </button>
                 <button type="button" class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                     data-bs-target="#modalRestaurarDemo" title="Voltar aos dados iniciais">
                     <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurar demo
@@ -566,6 +570,60 @@
         </div>
     </div>
 
+    <!-- Modal de Boas-Vindas e Instruções -->
+    <div class="modal fade" id="modalBoasVindas" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-success d-flex align-items-center gap-2">
+                        <i class="bi bi-house-heart-fill"></i>
+                        Bem-vindo ao Finlar
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3" style="color: #f1f5f9; line-height: 1.55;">
+                        O <span class="fw-semibold" style="color: #f8fafc;">Finlar</span> foi desenvolvido com o intuito
+                        de auxiliar famílias a organizarem e gerenciarem seus gastos mensais de forma simples, visual e
+                        prática.
+                    </p>
+
+                    <div class="p-3 rounded-3 resumo-limites-box">
+                        <p class="text-info small text-uppercase fw-semibold mb-2" style="letter-spacing: 0.6px;">
+                            Como usar o painel
+                        </p>
+                        <ul class="small mb-0 ps-3 d-flex flex-column gap-2" style="color: #e2e8f0; line-height: 1.5;">
+                            <li>
+                                <span class="fw-semibold" style="color: #f8fafc;">Renda e limites:</span> ajuste a renda
+                                familiar mensal e defina o teto de cada categoria manualmente ou pela divisão sugerida.
+                            </li>
+                            <li>
+                                <span class="fw-semibold" style="color: #f8fafc;">Lançamento de despesas:</span> informe
+                                descrição, valor, data e categoria para registrar um novo gasto no histórico.
+                            </li>
+                            <li>
+                                <span class="fw-semibold" style="color: #f8fafc;">Acompanhamento visual:</span>
+                                veja as barras de progresso mudarem de cor conforme os gastos se aproximam ou
+                                ultrapassam o limite.
+                            </li>
+                            <li>
+                                <span class="fw-semibold" style="color: #f8fafc;">Modo de teste:</span> use <span
+                                    class="fw-semibold" style="color: #f8fafc;">Limpar tudo</span> para começar do zero
+                                ou <span class="fw-semibold" style="color: #f8fafc;">Restaurar demo</span> para voltar
+                                aos dados de exemplo.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success fw-semibold px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-check-lg me-1"></i> Entendi, começar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -737,6 +795,15 @@
         resizeCanvas();
         initParticles();
         animateParticles();
+        // Exibe o modal de boas-vindas na primeira abertura da sessão
+        const modalBoasVindasEl = document.getElementById("modalBoasVindas");
+        if (modalBoasVindasEl && !sessionStorage.getItem("finlar_boas_vindas_visto")) {
+            const modalBoasVindas = new bootstrap.Modal(modalBoasVindasEl);
+            modalBoasVindas.show();
+            modalBoasVindasEl.addEventListener("hidden.bs.modal", () => {
+                sessionStorage.setItem("finlar_boas_vindas_visto", "true");
+            });
+        }
     </script>
 </body>
 
